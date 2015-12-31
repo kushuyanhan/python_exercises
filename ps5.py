@@ -76,6 +76,15 @@ def get_word_score(word, n):
     returns: int >= 0
     """
     # TO DO ...
+    score = 0
+    for letter in word:
+        print letter,SCRABBLE_LETTER_VALUES[letter]
+        score += SCRABBLE_LETTER_VALUES[letter]
+    if len(word) == n:
+        score += 50
+    return score
+
+
 
 #
 # Make sure you understand how this function works and what it does!
@@ -93,7 +102,7 @@ def display_hand(hand):
     hand: dictionary (string -> int)
     """
     for letter in hand.keys():
-        for j in range(hand[letter]):
+        for j in range(hand[letter.lower()]):
             print letter,              # print all on the same line
     print                              # print an empty line
 
@@ -146,6 +155,12 @@ def update_hand(hand, word):
     """
     # TO DO ...
 
+    freq = get_frequency_dict(word)
+    newhand = {}
+    for char in hand:
+        newhand[char] = hand[char]-freq.get(char,0)
+    return newhand
+
 #
 # Problem #3: Test word validity
 #
@@ -154,12 +169,17 @@ def is_valid_word(word, hand, word_list):
     Returns True if word is in the word_list and is entirely
     composed of letters in the hand. Otherwise, returns False.
     Does not mutate hand or word_list.
-    
+
     word: string
     hand: dictionary (string -> int)
     word_list: list of lowercase strings
     """
     # TO DO ...
+    freq = get_frequency_dict(word)
+    for letter in word:
+        if freq[letter] > hand.get(letter, 0):
+            return False
+    return word in word_list
 
 #
 # Problem #4: Playing a hand
@@ -193,7 +213,24 @@ def play_hand(hand, word_list):
       word_list: list of lowercase strings
     """
     # TO DO ...
-    print "play_hand not implemented." # replace this with your code...
+    total_score = 0
+    initial_handlen = HAND_SIZE
+
+    while sum(hand.values()) > 0:
+        display_hand(hand)
+        userWord = raw_input('Enter word, or a . to indicate that you are finished: ')
+        if userWord == '.':
+            break
+        else:
+            if not is_valid_word(input,hand, word_list):
+                print 'This is an invalid word, and enter an another word:'
+
+            else:
+                points = get_word_score(input, initial_handlen)
+                total_score += points
+                print '%s earned %d points. Total: %d points' % (userWord, points, total_score)
+                update_hand(hand, userWord)
+    print 'Total score: %d points.' % total_score
 
 #
 # Problem #5: Playing a game
@@ -215,28 +252,29 @@ def play_game(word_list):
     * If the user inputs anything else, ask them again.
     """
     # TO DO ...
-    print "play_game not implemented."         # delete this once you've completed Problem #4
-    play_hand(deal_hand(HAND_SIZE), word_list) # delete this once you've completed Problem #4
+    #print "play_game not implemented."         # delete this once you've completed Problem #4
+    #play_hand(deal_hand(HAND_SIZE), word_list) # delete this once you've completed Problem #4
     
-    ## uncomment the following block of code once you've completed Problem #4
-#    hand = deal_hand(HAND_SIZE) # random init
-#    while True:
-#        cmd = raw_input('Enter n to deal a new hand, r to replay the last hand, or e to end game: ')
-#        if cmd == 'n':
-#            hand = deal_hand(HAND_SIZE)
-#            play_hand(hand.copy(), word_list)
-#            print
-#        elif cmd == 'r':
-#            play_hand(hand.copy(), word_list)
-#            print
-#        elif cmd == 'e':
-#            break
-#        else:
-#            print "Invalid command."
+   # uncomment the following block of code once you've completed Problem #4
+    hand = deal_hand(HAND_SIZE)  #random init
+    while True:
+        cmd = raw_input('enter n to deal a new hand, r to replay last hand, e to exit:')
+        if cmd == 'n':
+            hand = deal_hand(HAND_SIZE)
+            play_hand(hand.copy(), word_list)
+            print
+        elif cmd == 'r':
+            play_hand(hand.copy(),word_list)
+            print
+        elif cmd == 'e':
+            break
+        else:
+            print 'invalid command'
 
-#
+
+
 # Build data structures used for entire session and play game
-#
+
 if __name__ == '__main__':
     word_list = load_words()
     play_game(word_list)
