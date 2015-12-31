@@ -46,6 +46,8 @@ def get_frequency_dict(sequence):
     return freq
 
 
+
+
 # (end of helper code)
 # -----------------------------------
 
@@ -54,4 +56,66 @@ def get_frequency_dict(sequence):
 # in the program.
 wordlist = load_words()
 
+
 # TO DO: your code begins here!
+word = []
+def play_ghost(word_list):
+
+    current_player = 1
+    print 'welcome to Ghost!'
+    print 'player1 goes first.'
+    print 'current word fragment: '''
+    while True:
+
+        print 'player %d turn' %(current_player)
+        print 'player %d says letter:' %(current_player),
+        user_letter = raw_input()
+
+        while not is_valid_letter(user_letter):
+            print 'This is not a letter, please enter a letter:'
+
+        update_word = update_fragment(user_letter)
+        display_fragment(update_word)
+
+        isCompleteWord = is_complete_word(update_word,word_list)
+        if isCompleteWord:
+            print 'player  %d loses because %s is a word!' %(current_player,update_word)
+            print 'player %d wins'  %((current_player+1)%2)
+            break
+        else:
+            isValid = is_valid_word(update_word, word_list)
+            if not isValid:
+                print 'player %d loses because no word begins with %s' %(current_player, update_word)
+                print 'player %d wins' %((current_player+1)%2)
+                break
+
+        if current_player >= 2:
+            current_player = (current_player+1)%2
+        else:
+            current_player += 1
+
+
+def update_fragment(letter):
+    word.append(letter)
+    return ''.join(word)
+
+def display_fragment(update_word):
+    print 'current word fragment is:', update_word
+
+def is_valid_letter(letter):
+    return letter in string.ascii_letters
+
+def is_valid_word(update_word,word_list):
+    for word in word_list:
+        if update_word == word.lower()[0:len(update_word)]:
+            return True
+    return False
+
+def is_complete_word(fragment,word_list):
+    return fragment in word_list
+
+if __name__ == '__main__':
+    word_list = load_words()
+    play_ghost(word_list)
+
+
